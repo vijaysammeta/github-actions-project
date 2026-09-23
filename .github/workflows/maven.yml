@@ -82,16 +82,24 @@ jobs:
           name: myapp
 
       # 10. Deploy WAR to Tomcat
-      - name: Deploy to Tomcat
+      - name: Deploy WAR to Tomcat
+        env:
+          TOMCAT_HOST: ${{ secrets.TOMCAT_HOST }}
+          TOMCAT_USER: ${{ secrets.TOMCAT_USER }}
+          TOMCAT_PASSWORD: ${{ secrets.TOMCAT_PASSWORD }}
         run: |
           WAR_FILE=$(ls *.war)
 
           echo "Deploying $WAR_FILE to Tomcat..."
 
-          curl -v --upload-file "$WAR_FILE" \
-            "http://${{ secrets.TOMCAT_USER }}:${{ secrets.TOMCAT_PASSWORD }}@${{ secrets.TOMCAT_HOST }}/manager/text/deploy?path=/myapp&update=true"
+          curl -v \
+            -u "$TOMCAT_USER:$TOMCAT_PASSWORD" \
+            --upload-file "$WAR_FILE" \
+            "http://$TOMCAT_HOST/manager/text/deploy?path=/myapp&update=true"
 
       # 11. Verify deployment
       - name: Verify deployment
+        env:
+          TOMCAT_HOST: ${{ secrets.TOMCAT_HOST }}
         run: |
-          curl -I "http://${{ secrets.TOMCAT_HOST }}/myapp"
+          curl -I "http://$TOMCAT_HOST/myapp"
