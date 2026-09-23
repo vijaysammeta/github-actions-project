@@ -52,7 +52,7 @@ jobs:
         run: |
           echo "SonarQube server URL: $SONAR_HOST"
 
-          mvn org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
+          mvn org.sonarsource.scanner.maven:sonar-maven-plugin:5.8.0.7211:sonar \
             -Dsonar.projectKey=hotstar \
             -Dsonar.host.url="$SONAR_HOST" \
             -Dsonar.token="$SONAR_LOGIN"
@@ -94,4 +94,4 @@ jobs:
       # 11. Verify deployment
       - name: Verify deployment
         run: |
-          curl -I http://${{ secrets.TOMCAT_HOST }}/myapp
+          curl -I "http://${{ secrets.TOMCAT_HOST }}/myapp"
