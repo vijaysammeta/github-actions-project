@@ -52,10 +52,10 @@ jobs:
         run: |
           echo "SonarQube server URL: $SONAR_HOST"
 
-          mvn sonar:sonar \
+          mvn org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
             -Dsonar.projectKey=hotstar \
             -Dsonar.host.url="$SONAR_HOST" \
-            -Dsonar.login="$SONAR_LOGIN"
+            -Dsonar.token="$SONAR_LOGIN"
 
       # 7. Build with Maven
       - name: Build with Maven
