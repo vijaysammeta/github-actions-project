@@ -45,8 +45,8 @@ jobs:
 
           mvn sonar:sonar \
             -Dsonar.projectKey=hotstar \
-            -Dsonar.host.url=$SONAR_HOST \
-            -Dsonar.login=$SONAR_LOGIN
+            -Dsonar.host.url="$SONAR_HOST" \
+            -Dsonar.login="$SONAR_LOGIN"
 
       # 6. Build with Maven
       - name: Build with Maven
