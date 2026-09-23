@@ -35,7 +35,16 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-maven-
 
-      # 5. SonarQube Analysis
+      # 5. Test SonarQube connection
+      - name: Test SonarQube Connection
+        env:
+          SONAR_HOST: ${{ secrets.SONAR_HOST }}
+        run: |
+          echo "Testing SonarQube connection..."
+          echo "URL: $SONAR_HOST"
+          curl -v --connect-timeout 10 "$SONAR_HOST"
+
+      # 6. SonarQube Analysis
       - name: SonarQube Analysis
         env:
           SONAR_HOST: ${{ secrets.SONAR_HOST }}
@@ -48,11 +57,11 @@ jobs:
             -Dsonar.host.url="$SONAR_HOST" \
             -Dsonar.login="$SONAR_LOGIN"
 
-      # 6. Build with Maven
+      # 7. Build with Maven
       - name: Build with Maven
         run: mvn clean package -DskipTests
 
-      # 7. Upload WAR artifact
+      # 8. Upload WAR artifact
       - name: Upload WAR artifact
         uses: actions/upload-artifact@v4
         with:
@@ -66,13 +75,13 @@ jobs:
 
     steps:
 
-      # 8. Download WAR artifact
+      # 9. Download WAR artifact
       - name: Download WAR artifact
         uses: actions/download-artifact@v4
         with:
           name: myapp
 
-      # 9. Deploy WAR to Tomcat
+      # 10. Deploy WAR to Tomcat
       - name: Deploy to Tomcat
         run: |
           WAR_FILE=$(ls *.war)
@@ -82,7 +91,7 @@ jobs:
           curl -v --upload-file "$WAR_FILE" \
             "http://${{ secrets.TOMCAT_USER }}:${{ secrets.TOMCAT_PASSWORD }}@${{ secrets.TOMCAT_HOST }}/manager/text/deploy?path=/myapp&update=true"
 
-      # 10. Verify deployment
+      # 11. Verify deployment
       - name: Verify deployment
         run: |
           curl -I http://${{ secrets.TOMCAT_HOST }}/myapp
