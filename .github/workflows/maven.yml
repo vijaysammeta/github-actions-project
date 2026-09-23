@@ -6,8 +6,11 @@ on:
 
 jobs:
 
+  # =========================
+  # BUILD JOB
+  # =========================
   build:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux]
 
     steps:
 
@@ -22,9 +25,17 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      # 3. Check Maven
-      - name: Check Maven
-        run: mvn -version
+      # 3. Ensure Maven is installed
+      - name: Ensure Maven is installed
+        run: |
+          if ! command -v mvn &> /dev/null; then
+            echo "Maven not found. Installing..."
+            sudo dnf install -y maven
+          else
+            echo "Maven is already installed"
+          fi
+
+          mvn -version
 
       # 4. Cache Maven dependencies
       - name: Cache Maven packages
@@ -50,7 +61,7 @@ jobs:
           SONAR_HOST: ${{ secrets.SONAR_HOST }}
           SONAR_LOGIN: ${{ secrets.SONAR_TOKEN }}
         run: |
-          echo "SonarQube server URL: $SONAR_HOST"
+          echo "Running SonarQube analysis..."
 
           mvn org.sonarsource.scanner.maven:sonar-maven-plugin:5.8.0.7211:sonar \
             -Dsonar.projectKey=hotstar \
@@ -69,9 +80,13 @@ jobs:
           path: target/*.war
 
 
+  # =========================
+  # DEPLOY JOB
+  # =========================
   deploy:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux]
     needs: build
+    environment: production
 
     steps:
 
